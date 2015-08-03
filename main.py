@@ -11,7 +11,6 @@ from argparse import ArgumentParser
 
 minSleepTime = 60
 maxSleepTime = 120
-# service = build('Gmail API', 'v1')
 
 def wait():
     sleep(randrange(minSleepTime, maxSleepTime))
@@ -69,21 +68,25 @@ def setupArguments():
     parser = ArgumentParser(description = 'Watch for website change and send e-mail notification')
     parser.add_argument('website', help = 'Website to watch for changes')
     parser.add_argument('email', help = 'E-mail to send notification if website changes')
+    parser.add_argument('key', help = 'Key for public google API access')
     parser.add_argument('--min-wait-time', default = minSleepTime, type = int,
-        help = 'Minimum time between site check')
+        help = 'Minimum time between site check (default = 60s)')
     parser.add_argument('--max-wait-time', default = maxSleepTime, type = int,
-        help = 'Maximum time between site check')
+        help = 'Maximum time between site check (default = 120s)')
     return parser
 
 def getArguments():
     parser = setupArguments()
-    return parser.parse_args(argv[1:])    
+    return parser.parse_args(argv[1:])
 
 def main():
     arguments = getArguments()
     site = arguments.website
     email = arguments.email
+    service = build('Gmail API', 'v1', developerKey = arguments.key)
     oldContent = getHtml(site)
+
+    # TODO: read optional min/max wait time
 
     while True:
         newContent = getHtml(site)
