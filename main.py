@@ -1,14 +1,18 @@
 #!/usr/bin/python3
 from apiclient.discovery import build
+from time import sleep
+from email.mime.text import MIMEText
+from difflib import SequenceMatcher
+import urllib.request
+from apiclient import errors
+from random import randrange
 
-def areStringsDiffer(a, b):
-    from difflib import SequenceMatcher
+minSleepTime = 60
+maxSleepTime = 120
+# service = build('Gmail API', 'v1')
 
-    matcher = SequenceMatcher(None, a, b)
-
-    print(matcher.ratio())
-
-    return matcher.ratio() == 1.0
+def wait():
+    sleep(randrange(minSleepTime, maxSleepTime))
 
 def sendMessage(service, user_id, message):
     """Send an email message.
@@ -22,8 +26,6 @@ def sendMessage(service, user_id, message):
     Returns:
         Sent Message.
     """
-    from apiclient import errors
-
     try:
         message = (service.users().messages().send(userId=user_id, body=message)
                .execute())
@@ -44,24 +46,38 @@ def createMessage(sender, to, subject, message_text):
     Returns:
     An object containing a base64 encoded email object.
     """
-    from email.mime.text import MIMEText
-
     message = MIMEText(message_text)
     message['to'] = to
     message['from'] = sender
     message['subject'] = subject
     return {'raw': base64.b64encode(message.as_string())}
 
+def sendNotification(email):
+    pass
+
+def areStringsDiffer(a, b):
+    matcher = SequenceMatcher(None, a, b)
+    return matcher.ratio() == 1.0
+
 def getHtml(url):
-    import urllib.request
 
     with urllib.request.urlopen(url) as response:
        return response.read()  
 
 def main():
-    # service = build('Gmail API', 'v1')
-    # print(getHtml('http://www.davidgilmour.com'))
-    print(areStringsDiffer('alamakota', 'alamakota'))
+    site = 'http://www.davidgilmour.com'
+    email = 'foo@bar.com'
+    oldContent = getHtml(site)
+
+    while True:
+        newContent = getHtml(site)
+        if areStringsDiffer(oldContent, newContent):
+            print('Content differ!')
+            sendNotification(email)
+            continue
+        print('Same content!')
+        oldContent = newContent
+        wait()
 
 if __name__ == '__main__':
     main()
