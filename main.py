@@ -67,10 +67,12 @@ def getHtml(url):
 
 def setupArguments():
     parser = ArgumentParser(description = 'Watch for website change and send e-mail notification')
-    parser.add_argument('website')
-    parser.add_argument('email')
-    parser.add_argument('--min-wait-time', default = minSleepTime, type = int)
-    parser.add_argument('--max-wait-time', default = maxSleepTime, type = int)
+    parser.add_argument('website', help = 'Website to watch for changes')
+    parser.add_argument('email', help = 'E-mail to send notification if website changes')
+    parser.add_argument('--min-wait-time', default = minSleepTime, type = int,
+        help = 'Minimum time between site check')
+    parser.add_argument('--max-wait-time', default = maxSleepTime, type = int,
+        help = 'Maximum time between site check')
     return parser
 
 def getArguments():
