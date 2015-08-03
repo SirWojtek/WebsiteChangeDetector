@@ -57,7 +57,7 @@ def sendNotification(email):
 
 def areStringsDiffer(a, b):
     matcher = SequenceMatcher(None, a, b)
-    return matcher.ratio() == 1.0
+    return matcher.ratio() != 1.0
 
 def getHtml(url):
 
@@ -74,8 +74,8 @@ def main():
         if areStringsDiffer(oldContent, newContent):
             print('Content differ!')
             sendNotification(email)
-            continue
-        print('Same content!')
+        else:
+            print('Same content!')
         oldContent = newContent
         wait()
 
