@@ -6,7 +6,9 @@ def areStringsDiffer(a, b):
 
     matcher = SequenceMatcher(None, a, b)
 
-    return matcher.ratio() != 1.0
+    print(matcher.ratio())
+
+    return matcher.ratio() == 1.0
 
 def sendMessage(service, user_id, message):
     """Send an email message.
@@ -59,7 +61,7 @@ def getHtml(url):
 def main():
     # service = build('Gmail API', 'v1')
     # print(getHtml('http://www.davidgilmour.com'))
-    print areStringsDiffer('alamakota', 'alamakota')
+    print(areStringsDiffer('alamakota', 'alamakota'))
 
 if __name__ == '__main__':
     main()
