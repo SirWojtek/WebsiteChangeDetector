@@ -2,9 +2,11 @@
 from apiclient.discovery import build
 
 def areStringsDiffer(a, b):
-    import difflib
+    from difflib import SequenceMatcher
 
-    pass
+    matcher = SequenceMatcher(a, b)
+
+    print matcher.ratio()
 
 def sendMessage(service, user_id, message):
     """Send an email message.
@@ -56,7 +58,8 @@ def getHtml(url):
 
 def main():
     # service = build('Gmail API', 'v1')
-    print(getHtml('http://www.davidgilmour.com'))
+    # print(getHtml('http://www.davidgilmour.com'))
+    areStringsDiffer('ala', 'kota')
 
 if __name__ == '__main__':
     main()
