@@ -4,8 +4,10 @@ from time import sleep
 from email.mime.text import MIMEText
 from difflib import SequenceMatcher
 import urllib.request
+from sys import argv
 from apiclient import errors
 from random import randrange
+from argparse import ArgumentParser
 
 minSleepTime = 60
 maxSleepTime = 120
@@ -60,13 +62,25 @@ def areStringsDiffer(a, b):
     return matcher.ratio() != 1.0
 
 def getHtml(url):
-
     with urllib.request.urlopen(url) as response:
        return response.read()  
 
+def setupArguments():
+    parser = ArgumentParser(description = 'Watch for website change and send e-mail notification')
+    parser.add_argument('website')
+    parser.add_argument('email')
+    parser.add_argument('--min-wait-time', default = minSleepTime, type = int)
+    parser.add_argument('--max-wait-time', default = maxSleepTime, type = int)
+    return parser
+
+def getArguments():
+    parser = setupArguments()
+    return parser.parse_args(argv[1:])    
+
 def main():
-    site = 'http://www.davidgilmour.com'
-    email = 'foo@bar.com'
+    arguments = getArguments()
+    site = arguments.website
+    email = arguments.email
     oldContent = getHtml(site)
 
     while True:
