@@ -4,6 +4,7 @@ from time import sleep
 from email.mime.text import MIMEText
 from difflib import SequenceMatcher
 import urllib.request
+import base64
 from sys import argv
 from apiclient import errors
 from random import randrange
@@ -51,10 +52,11 @@ def createMessage(sender, to, subject, message_text):
     message['to'] = to
     message['from'] = sender
     message['subject'] = subject
-    return {'raw': base64.b64encode(message.as_string())}
+    return {'raw': base64.b64encode(bytes(message.as_string(), 'utf-8')).decode('utf-8')}
 
-def sendNotification(email):
-    pass
+def sendNotification(service, email):
+    rawMessage = createMessage('bot', email, 'test', 'test message')
+    sendMessage(service, 'me', rawMessage)
 
 def areStringsDiffer(a, b):
     matcher = SequenceMatcher(None, a, b)
@@ -83,20 +85,22 @@ def main():
     arguments = getArguments()
     site = arguments.website
     email = arguments.email
-    service = build('Gmail API', 'v1', developerKey = arguments.key)
+    service = build('gmail', 'v1', developerKey = arguments.key)
     oldContent = getHtml(site)
 
     # TODO: read optional min/max wait time
 
-    while True:
-        newContent = getHtml(site)
-        if areStringsDiffer(oldContent, newContent):
-            print('Content differ!')
-            sendNotification(email)
-        else:
-            print('Same content!')
-        oldContent = newContent
-        wait()
+    sendNotification(service, email)
+
+    # while True:
+    #     newContent = getHtml(site)
+    #     if areStringsDiffer(oldContent, newContent):
+    #         print('Content differ!')
+    #         sendNotification(service, email)
+    #     else:
+    #         print('Same content!')
+    #     oldContent = newContent
+    #     wait()
 
 if __name__ == '__main__':
     main()
