@@ -1,42 +1,32 @@
 #!/usr/bin/python3
 from time import sleep
+from datetime import datetime
 from email.mime.text import MIMEText
 from difflib import SequenceMatcher
 import urllib.request
-import base64
 from sys import argv
 from random import randrange
 from argparse import ArgumentParser
-import httplib2
 from smtplib import SMTP_SSL
 
 def wait(minSleepTime, maxSleepTime):
     sleep(randrange(minSleepTime, maxSleepTime))
 
 def createMessage(sender, to, subject, message_text):
-    """Create a message for an email.
-
-    Args:
-    sender: Email address of the sender.
-    to: Email address of the receiver.
-    subject: The subject of the email message.
-    message_text: The text of the email message.
-
-    Returns:
-    An object containing a base64 encoded email object.
-    """
     message = MIMEText(message_text)
     message['to'] = to
     message['from'] = sender
     message['subject'] = subject
     return message
 
-def sendNotification(receiver, sender, password):
-    rawMessage = createMessage('bot', receiver, 'test', 'test message')
+def sendNotification(arguments):
+    rawMessage = createMessage('bot', arguments.receiver,
+        'Change of site ' + arguments.website + ' detected',
+        'Change of ' + arguments.website + ' was detected by script on ' + str(datetime.today()))
     smtp = SMTP_SSL('smtp.gmail.com')
-    smtp.login(sender, password)
+    smtp.login(arguments.sender, arguments.password)
 
-    smtp.sendmail('bot', [receiver], rawMessage.as_string())
+    smtp.sendmail('bot', [arguments.receiver], rawMessage.as_string())
     smtp.quit()
 
 def areStringsDiffer(a, b):
@@ -71,8 +61,8 @@ def main():
     while True:
         newContent = getHtml(site)
         if areStringsDiffer(oldContent, newContent):
-            print('Content differ!')
-            sendNotification(arguments.receiver, arguments.sender, arguments.password)
+            print('Content differ! Sending email notification for ' + arguments.receiver)
+            sendNotification(arguments)
         else:
             print('Same content!')
         oldContent = newContent
